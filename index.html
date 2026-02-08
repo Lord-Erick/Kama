@@ -171,11 +171,39 @@ const imagens = [
  'https://i.postimg.cc/R6nW4jCJ/f9.jpg'
 ];
 
-const legendas=[
+const legendas = [
  "🔥 Começando bem…",
  "😈 Essa promete…",
  "💋 Curta o momento…",
- "🔥 Sem pressa…"
+ "🔥 Sem pressa…",
+ "🎭 Você ganhou uma surpresa especial!",
+ "🎉 Parabéns! Essa é a sua sorte do dia!",
+ "💥 BOOM! Você acertou na mosca!",
+ "🌟 Sorte grande! Curta sua recompensa!",
+ "🔥 Essa imagem foi feita para você!",
+ "😏 Essa vai ser interessante…",
+ "💕 Aproveite cada instante…",
+ "✨ Magia acontecendo…",
+ "🌙 Hora de se conectar…",
+ "⚡ Energia intensa…",
+ "🌹 Romântico e ousado…",
+ "💫 Deixe-se levar…",
+ "🎯 Acertou em cheio!",
+ "🌊 Fluindo naturalmente…",
+ "🌸 Doce e provocante…",
+ "🦋 Liberte-se…",
+ "🌌 Noite de descobertas…",
+ "🍷 Delicie-se…",
+ "🎪 Circo de sensações…",
+ "🌋 Explosão de prazer…",
+ "🕯️ Luz na escuridão…",
+ "🎶 Sintonia perfeita…",
+ "🧩 Peças se encaixando…",
+ "🌅 Novo começo…",
+ "🌀 Vórtice de sensações…",
+ "🌈 Arco-íris de emoções…",
+ "🪐 Viagem intergaláctica…",
+ "👑 Você é o rei/rainha!"
 ];
 
 const desafios=[
@@ -186,6 +214,11 @@ const desafios=[
  "🔥 Sem mãos por 15 segundos",
  "💦 Sussurre algo proibido"
 ];
+
+// Variáveis para controle
+let imagensDisponiveis = [...imagens];
+let imagensSorteadas = [];
+let ultimoSorteio = null;
 
 const chat=document.getElementById("chat");
 
@@ -204,6 +237,67 @@ function show(id){
   document.querySelectorAll(".controls")
     .forEach(c=>c.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
+}
+
+/* ===============================
+   SORTEIO MELHORADO
+================================ */
+function sortear(){
+  // Se já sortearam todas as imagens, reinicia
+  if(imagensDisponiveis.length === 0){
+    imagensDisponiveis = [...imagens];
+    imagensSorteadas = [];
+    msg("🔄 Todas as imagens foram sorteadas! Reiniciando...");
+  }
+  
+  // Sorteia uma imagem aleatória das disponíveis
+  const indice = Math.floor(Math.random() * imagensDisponiveis.length);
+  const imagemSorteada = imagensDisponiveis[indice];
+  
+  // Remove da lista de disponíveis e adiciona às sorteadas
+  imagensDisponiveis.splice(indice, 1);
+  imagensSorteadas.push(imagemSorteada);
+  ultimoSorteio = imagemSorteada;
+  
+  // Encontra o índice da imagem no array original para a legenda
+  const indiceOriginal = imagens.indexOf(imagemSorteada);
+  
+  // Seleciona uma legenda (usa o índice original ou aleatório se maior que o array)
+  let legenda;
+  if(indiceOriginal < legendas.length){
+    legenda = legendas[indiceOriginal];
+  }else{
+    // Se não há legenda específica, escolhe uma aleatória
+    legenda = legendas[Math.floor(Math.random() * legendas.length)];
+  }
+  
+  // Mostra a imagem com legenda
+  msg(`<img src="${imagemSorteada}" alt="Posição sorteada"><div class="caption">${legenda}</div>`);
+  
+  // Atualiza contador no console (para debug)
+  console.log(`Imagens sorteadas: ${imagensSorteadas.length}/${imagens.length}`);
+  console.log(`Imagens disponíveis: ${imagensDisponiveis.length}`);
+  
+  show("c-after");
+}
+
+function repetir(){
+  // Se o usuário quer repetir, a imagem atual volta para disponíveis
+  if(ultimoSorteio && !imagensDisponiveis.includes(ultimoSorteio)){
+    imagensDisponiveis.push(ultimoSorteio);
+    const index = imagensSorteadas.indexOf(ultimoSorteio);
+    if(index > -1){
+      imagensSorteadas.splice(index, 1);
+    }
+  }
+  msg("🔥 Então vamos tentar outra…");
+  show("c-yesno");
+}
+
+function feito(){
+  // Mantém a imagem como sorteada (não volta para disponíveis)
+  msg("😈 Muito bem… quer mais?");
+  show("c-main");
 }
 
 /* ===============================
@@ -226,12 +320,6 @@ function voltar(){
   show("c-main");
 }
 
-function sortear(){
-  const i=Math.floor(Math.random()*imagens.length);
-  msg(`<img src="${imagens[i]}"><div class="caption">${legendas[i]}</div>`);
-  show("c-after");
-}
-
 function desafio(){
   const d=desafios[Math.floor(Math.random()*desafios.length)];
   msg(`<b>🔥 Desafio:</b><br>${d}`);
@@ -240,16 +328,6 @@ function desafio(){
 
 function continuar(){
   msg("😏 Quer tentar outra?");
-  show("c-yesno");
-}
-
-function feito(){
-  msg("😈 Muito bem… quer mais?");
-  show("c-main");
-}
-
-function repetir(){
-  msg("🔥 Então vamos tentar outra…");
   show("c-yesno");
 }
 
@@ -267,4 +345,4 @@ if("serviceWorker" in navigator){
 </script>
 
 </body>
-  </html>
+</html>
